@@ -8,8 +8,9 @@ function localCompetition(name){
  const records=LOCAL_COMPETITION[name]||[];
  return `<div class="local-evidence"><span class="overline">LOCALITY EVIDENCE</span>${records.length?records.map(r=>`<div class="local-evidence-row"><b>${esc(r.brand)} · ${esc(r.area)}</b><small>${esc(r.status)}</small></div>`).join(''):'<div class="local-evidence-row"><b>Store localities not verified</b></div>'}<small>Exact addresses and current coverage unverified</small></div>`;
 }
-function mapCityTabs(){return `<div class="city-pills map-city-tabs" aria-label="City maps">${shortlist.map(c=>`<button data-map-city="${esc(c.name)}" aria-pressed="${mapState.cityName===c.name}" class="${mapState.cityName===c.name?'active':''}">${esc(c.name)} <small>${c.name==='Nagpur'?'WARD MODEL':'WARDS'}</small></button>`).join('')}</div>`;}
+function mapCityTabs(){return `<div class="city-pills map-city-tabs" aria-label="City maps">${shortlist.map(c=>`<button data-map-city="${esc(c.name)}" aria-pressed="${mapState.cityName===c.name}" class="${mapState.cityName===c.name?'active':''}">${esc(c.name)} <small>${SMALL_TOWNS.cities[c.name]?'GRID':c.name==='Nagpur'?'WARD MODEL':'WARDS'}</small></button>`).join('')}</div>`;}
 function geographicEvidence(name){
+ if(SMALL_TOWNS.cities[name]){smallTownEvidence(name);return;}
  if(name==='Nagpur'){competitorEvidence();return;}
  const g=PRIORITY_MAPS.cities.find(x=>x.name===name),records=LOCAL_COMPETITION[name]||[];
  document.getElementById('method-title').textContent=name+' / map evidence';
@@ -21,7 +22,7 @@ function geographicEvidence(name){
  document.getElementById('method-body').innerHTML+=`<section class="method-section"><h3>One-to-four-area model</h3><p>${esc(CITY_NETWORKS.method)} ${esc(CITY_NETWORKS.limitations)}</p><p>All four solutions are ${n.scenarios.every(s=>s.solverStatus===0)?'solver-certified optima for the stated mathematical model':'labelled by their solver status in the export'}. Independent enumeration checks the one- and two-area optima, and all four Vadodara cases. Every objective is recomputed from nearest-area distances.</p><p>Mapped built-up area: ${number(n.builtKm2,2)} km². Independent polygon rasterisers differ by at most ${number(n.maxRasterizerDifferencePp,2)} percentage points in the built-up share. This checks calculation consistency, not ground truth. Satellite weights are not population, income or orders.</p><a href="https://esa-worldcover.org/en/data-access" target="_blank" rel="noopener">Official classification data and methodology ↗</a></section>${name==='Vadodara'?`<section class="method-section"><h3>Vadodara alignment check</h3><p>${w.alignmentCheck.insidePublishedWard} of ${w.alignmentCheck.points} independent municipal plot coordinates fall inside their published ward. All ${w.alignmentCheck.within150mOfPublishedWard} lie inside or within 150 metres of it. These points were not used to fit the map. This is a ward-membership check, not a survey-accuracy guarantee; no check points covered Ward 19.</p><a href="${w.alignmentCheck.source}" target="_blank" rel="noopener">Municipal coordinate register ↗</a></section>`:''}`;
  document.getElementById('method-dialog').showModal();
 }
-function priorityNetwork(){return CITY_NETWORKS.cities[mapState.cityName].scenarios[(mapState.networkP||1)-1];}
+function priorityNetwork(){return (SMALL_TOWNS.cities[mapState.cityName]?.network||CITY_NETWORKS.cities[mapState.cityName]).scenarios[(mapState.networkP||1)-1];}
 function priorityNetworkControls(){
  const p=mapState.networkP||1;
  return `<div class="map-room-command"><div class="map-room-network"><span class="control-label">SELECT NETWORK</span><div class="segments">${[1,2,3,4].map(n=>`<button data-network-p="${n}" aria-pressed="${p===n}" class="${p===n?'active':''}">${n} ${n===1?'area':'areas'}</button>`).join('')}</div></div><span class="network-basis">Built-up land proximity · 2021</span></div>`;
@@ -41,6 +42,7 @@ function cityWardDrawing(g,w,z){
  return paths+labels;
 }
 function priorityCityMap(){
+ if(SMALL_TOWNS.cities[mapState.cityName])return smallTownMap();
  const g=PRIORITY_MAPS.cities.find(x=>x.name===mapState.cityName),c=shortlist.find(x=>x.name===g.name),m=c.model,w=CITY_WARDS[g.name];
  const reference=false,layer=mapState.base==='landcover'?'landcover':'satellite',z=mapState.zoom,v=[mapState.cx-800/z,mapState.cy-759.5/z,1600/z,1519/z].join(' '),selected=w.wards.find(x=>x.id===mapState.priorityWard);
  const tabs=[['satellite','Satellite'],['landcover','Land cover']];const network=priorityNetwork();
