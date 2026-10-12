@@ -16,4 +16,6 @@ The priority table includes six existing city cases and five smaller-market watc
 
 Unconfirmed Flipkart presence does not establish absence. Market sizes and entrant ambitions are modelled scenarios. Ward pins identify search areas, not verified leasable premises. Satellite imagery dates differ from the research date. Straight-line network comparisons do not demonstrate ten-minute road delivery or current traffic conditions. Competitor store coordinates and market shares are not represented as verified when unavailable.
 
+The five smaller towns now use individual 2026 Copernicus Sentinel-2 L2A true-colour acquisitions, verified against the official catalogue: Navsari 8 October, Satara 3 May, Ratnagiri 10 October, Vidisha and Sehore 9 October. Native resolution is still 10 metres. These clearer, losslessly encoded backgrounds replace the 2021 annual composites; land-cover weights and all search-area models remain dated 2021. No AI upscaling or sharpening is used.
+
 Retain the in-app evidence, imagery attribution and model labels when sharing or modifying this project.
